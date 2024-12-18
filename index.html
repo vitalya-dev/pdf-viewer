@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF.js Example</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.min.mjs"></script>
+    <title>Render PDF Pages</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
-    <h1>PDF.js Viewer</h1>
-    <canvas id="pdf-canvas"></canvas>
+    <div id="pdf-container"></div>
 
     <script>
-        // URL of the PDF file you want to display
-        const url = '123.pdf';
+        const pdfUrl = './123.pdf'; // Path to your PDF file
 
-        // Asynchronously download PDF
-        pdfjsLib.getDocument(url).promise.then(function(pdf) {
-            console.log('PDF loaded');
+        // Asynchronously download the PDF
+        pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+            const pdfContainer = document.getElementById('pdf-container');
+            const totalPages = pdf.numPages;
             
-            // Fetch the first page
-            pdf.getPage(1).then(function(page) {
-                console.log('Page loaded');
-                
-                const canvas = document.getElementById('pdf-canvas');
-                const context = canvas.getContext('2d');
-                const viewport = page.getViewport({ scale: 1 });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Render PDF page into canvas context
-                const renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                page.render(renderContext);
-            });
+            // Render each page
+            for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                pdf.getPage(pageNum).then(function(page) {
+                    const canvas = document.createElement('canvas');
+                    pdfContainer.appendChild(canvas);
+
+                    const context = canvas.getContext('2d');
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    // Render PDF page into canvas
+                    page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    });
+                });
+            }
         });
     </script>
 </body>
